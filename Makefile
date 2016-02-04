@@ -1,12 +1,20 @@
+all: clean compile_server compile_client
+
 clean:
-	rm server
-	rm client
+	if [ -a server ]; \
+		then \
+			rm server; \
+	fi; \
+	if [ -a client ]; \
+		then \
+			rm client; \
+	fi;
 
 compile_server:
-	clang++ --std=c++11 UDPServer/server.cpp -o server
+	clang++ --std=c++11 UDPServer/server.cpp Ports/Ports.cpp -o server
 
 compile_client:
-		clang++ --std=c++11 UDPClient/client.cpp -o client
+		clang++ --std=c++11 UDPClient/client.cpp Ports/Ports.cpp -o client
 
 run_server: compile_server
 	./server 9090
