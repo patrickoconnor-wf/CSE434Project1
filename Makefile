@@ -1,5 +1,6 @@
 server_source_list = UDPServer/server.cpp Ports/ports.cpp Packet/packet.cpp
 client_source_list = UDPClient/client.cpp Ports/ports.cpp Packet/packet.cpp
+ACTION = This_should_be_unused
 
 all: clean compile_server compile_client
 
@@ -20,6 +21,7 @@ compile_client:
 	clang++ --std=c++11 $(client_source_list) -o client
 
 run_server: compile_server
+	# TODO: Make server port a constant. Probably last available port
 	./server 9090
 
 run_client: compile_client
