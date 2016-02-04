@@ -20,3 +20,12 @@ char* Packet::getAction() {
 char* Packet::getMessage() {
   return this->message;
 }
+
+char* Packet::serialize() {
+  //Add 2 to the total message size for the terminator and separator
+  int bufferLen = strlen(this->action) + strlen(this->message) + 2;
+  char *buffer = new char[bufferLen];
+  snprintf(buffer, bufferLen, "%s|%s", this->action, this->message);
+  buffer[bufferLen-1] = '\0';
+  return buffer;
+}

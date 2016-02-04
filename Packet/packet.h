@@ -1,6 +1,7 @@
 #ifndef __PACKET_DEFINED__
 #define __PACKET_DEFINED__
 #include <cstring>
+#include <cstdio>
 
 class Packet {
   private:
