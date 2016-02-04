@@ -6,6 +6,8 @@
 #include <unistd.h>     /* for close() */
 
 /* Project Imports */
+#include "../Constants/actions.h" /* Contains UPDATE, QUERY, EXIT constants */
+#include "../Packet/packet.h"
 #include "../Ports/ports.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
@@ -28,6 +30,8 @@ int main(int argc, char *argv[])
     char echoBuffer[ECHOMAX+1];      /* Buffer for receiving echoed string */
     int echoStringLen;               /* Length of string to echo */
     int respStringLen;               /* Length of received response */
+    Packet *sendPacket;              /* A created Packet that will be sent */
+    Packet *recvPacket;              /* A created Packet that was received */
 
     if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
     {
@@ -37,8 +41,9 @@ int main(int argc, char *argv[])
 
     servIP = argv[1];           /* First arg: server IP address (dotted quad) */
     echoString = argv[2];       /* Second arg: string to echo */
+    sendPacket = new Packet::Packet(UPDATE, "This is a message");
 
-    if ((echoStringLen = strlen(echoString)) > ECHOMAX)  /* Check input length */
+    if ((echoStringLen = strlen(sendPacket->serialize())) > ECHOMAX)  /* Check input length */
         exitWithError("Echo word too long");
 
     if (argc == 4)
@@ -58,16 +63,21 @@ int main(int argc, char *argv[])
 
     /* Send the string to the server */
     if (sendto(sock,
-        echoString,
-        echoStringLen,
-        0,(struct sockaddr *) &echoServAddr,
+        sendPacket->serialize(),
+        strlen(sendPacket->serialize()),
+        0,
+        (struct sockaddr *) &echoServAddr,
         sizeof(echoServAddr)) != echoStringLen)
           exitWithError("sendto() sent a different number of bytes than expected");
 
     /* Recv a response */
     fromSize = sizeof(fromAddr);
-    if ((respStringLen = recvfrom(sock, echoBuffer, ECHOMAX, 0,
-         (struct sockaddr *) &fromAddr, &fromSize)) != echoStringLen)
+    if ((respStringLen = recvfrom(sock,
+                                  echoBuffer,
+                                  ECHOMAX,
+                                  0,
+                                  (struct sockaddr *) &fromAddr,
+                                  &fromSize)) != echoStringLen)
         exitWithError("recvfrom() failed");
 
     if (echoServAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
