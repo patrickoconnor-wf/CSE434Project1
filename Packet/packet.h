@@ -2,6 +2,7 @@
 #define __PACKET_DEFINED__
 #include <cstring>
 #include <cstdio>
+#include <unistd.h>
 
 class Packet {
   private:
