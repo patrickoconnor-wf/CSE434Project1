@@ -1,3 +1,6 @@
+server_source_list = UDPServer/server.cpp Ports/ports.cpp Packet/packet.cpp
+client_source_list = UDPClient/client.cpp Ports/ports.cpp Packet/packet.cpp
+
 all: clean compile_server compile_client
 
 clean:
@@ -11,10 +14,10 @@ clean:
 	fi;
 
 compile_server:
-	clang++ --std=c++11 UDPServer/server.cpp Ports/Ports.cpp -o server
+	clang++ --std=c++11 $(server_source_list) -o server
 
 compile_client:
-		clang++ --std=c++11 UDPClient/client.cpp Ports/Ports.cpp -o client
+	clang++ --std=c++11 $(client_source_list) -o client
 
 run_server: compile_server
 	./server 9090
