@@ -29,3 +29,7 @@ char* Packet::serialize() {
   buffer[bufferLen-1] = '\0';
   return buffer;
 }
+
+Packet* Packet::deserialize() {
+  // TODO: Implement Deserialize
+}

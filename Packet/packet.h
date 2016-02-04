@@ -14,5 +14,6 @@ class Packet {
     char* getAction();
     char* getMessage();
     char* serialize();
+    Packet* deserialize();
 };
 #endif
