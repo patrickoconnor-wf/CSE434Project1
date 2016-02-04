@@ -6,7 +6,7 @@
 #include <unistd.h>     /* for close() */
 
 /* Project Imports */
-#include "../Ports/Ports.h"
+#include "../Ports/ports.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
 
