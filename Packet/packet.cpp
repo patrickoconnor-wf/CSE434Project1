@@ -32,4 +32,5 @@ char* Packet::serialize() {
 
 Packet* Packet::deserialize() {
   // TODO: Implement Deserialize
+  return new Packet("", "");
 }
