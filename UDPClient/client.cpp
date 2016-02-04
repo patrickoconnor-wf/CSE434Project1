@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
 
     servIP = argv[1];           /* First arg: server IP address (dotted quad) */
     echoString = argv[2];       /* Second arg: string to echo */
+    // TODO: Define the structure for the ACK Packet. 
     sendPacket = new Packet::Packet(UPDATE, "This is a message");
 
     if ((echoStringLen = strlen(sendPacket->serialize())) > ECHOMAX)  /* Check input length */
