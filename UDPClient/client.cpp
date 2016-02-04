@@ -5,9 +5,12 @@
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
 
+/* Project Imports */
+#include "../Ports/Ports.h"
+
 #define ECHOMAX 255     /* Longest string to echo */
 
-void DieWithError(const char *errorMessage) /* External error handling function */
+void exitWithError(const char *errorMessage) /* External error handling function */
 {
     perror(errorMessage);
     exit(1);
@@ -36,7 +39,7 @@ int main(int argc, char *argv[])
     echoString = argv[2];       /* Second arg: string to echo */
 
     if ((echoStringLen = strlen(echoString)) > ECHOMAX)  /* Check input length */
-        DieWithError("Echo word too long");
+        exitWithError("Echo word too long");
 
     if (argc == 4)
         echoServPort = atoi(argv[3]);  /* Use given port, if any */
@@ -45,7 +48,7 @@ int main(int argc, char *argv[])
 
     /* Create a datagram/UDP socket */
     if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
-        DieWithError("socket() failed");
+        exitWithError("socket() failed");
 
     /* Construct the server address structure */
     memset(&echoServAddr, 0, sizeof(echoServAddr));    /* Zero out structure */
@@ -59,13 +62,13 @@ int main(int argc, char *argv[])
         echoStringLen,
         0,(struct sockaddr *) &echoServAddr,
         sizeof(echoServAddr)) != echoStringLen)
-          DieWithError("sendto() sent a different number of bytes than expected");
+          exitWithError("sendto() sent a different number of bytes than expected");
 
     /* Recv a response */
     fromSize = sizeof(fromAddr);
     if ((respStringLen = recvfrom(sock, echoBuffer, ECHOMAX, 0,
          (struct sockaddr *) &fromAddr, &fromSize)) != echoStringLen)
-        DieWithError("recvfrom() failed");
+        exitWithError("recvfrom() failed");
 
     if (echoServAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
     {
