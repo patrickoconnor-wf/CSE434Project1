@@ -41,12 +41,11 @@ int main(int argc, char *argv[])
 
     servIP = argv[1];           /* First arg: server IP address (dotted quad) */
     echoString = argv[2];       /* Second arg: string to echo */
-    // TODO: Define the structure for the ACK Packet.
-    sendPacket = new Packet::Packet(UPDATE, "This is a message");
 
     if ((echoStringLen = strlen(sendPacket->serialize())) > ECHOMAX)  /* Check input length */
         exitWithError("Echo word too long");
 
+    // TODO: echoServPort should be a randomly selected port in valid range
     if (argc == 4)
         echoServPort = atoi(argv[3]);  /* Use given port, if any */
     else
@@ -61,6 +60,8 @@ int main(int argc, char *argv[])
     echoServAddr.sin_family = AF_INET;                 /* Internet addr family */
     echoServAddr.sin_addr.s_addr = inet_addr(servIP);  /* Server IP address */
     echoServAddr.sin_port   = htons(echoServPort);     /* Server port */
+
+    // TODO: Determine raw length of what should be sent
 
     /* Send the string to the server */
     // TODO: Determine the number of packets to send so that the serialize is less than ECHOMAX
