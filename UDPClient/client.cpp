@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
     servIP = argv[1];           /* First arg: server IP address (dotted quad) */
     echoString = argv[2];       /* Second arg: string to echo */
-    // TODO: Define the structure for the ACK Packet. 
+    // TODO: Define the structure for the ACK Packet.
     sendPacket = new Packet::Packet(UPDATE, "This is a message");
 
     if ((echoStringLen = strlen(sendPacket->serialize())) > ECHOMAX)  /* Check input length */
@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
     echoServAddr.sin_port   = htons(echoServPort);     /* Server port */
 
     /* Send the string to the server */
+    // TODO: Determine the number of packets to send so that the serialize is less than ECHOMAX
     if (sendto(sock,
         sendPacket->serialize(),
         strlen(sendPacket->serialize()),
