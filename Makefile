@@ -1,6 +1,11 @@
-server_source_list = UDPServer/server.cpp Ports/ports.cpp Packet/packet.cpp
-client_source_list = UDPClient/client.cpp Ports/ports.cpp Packet/packet.cpp
+server_source_list = UDPServer/server.cpp Ports/ports.cpp Packet/packet.cpp \
+										 Utils/network_utils.cpp
+client_source_list = UDPClient/client.cpp Ports/ports.cpp Packet/packet.cpp \
+										 Utils/network_utils.cpp
+test_source_list = Ports/ports.cpp Packet/packet.cpp Utils/network_utils.cpp \
+									 test.cpp
 ACTION = This_should_be_unused
+server_port = 4923
 
 all: clean compile_server compile_client
 
@@ -21,14 +26,17 @@ compile_client:
 	clang++ --std=c++11 $(client_source_list) -o client
 
 run_server: compile_server
-	# TODO: Make server port a constant. Probably last available port
-	./server 9090
+	# Running server on port $(server_port)
+	./server $(server_port)
 
 run_client: compile_client
-	./client 127.0.0.1 $(ACTION) 9090
+	./client 127.0.0.1 $(ACTION) $(server_port)
 
 run_server_no_build:
-	./server 9090
+	./server $(server_port)
 
 run_client_no_build:
-	./client 127.0.0.1 $(ACTION) 9090
+	./client 127.0.0.1 $(ACTION) $(server_port)
+
+compile_test:
+	clang++ --std=c++11 $(test_source_list) -o test
