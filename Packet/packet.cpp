@@ -22,14 +22,18 @@ char* Packet::getMessage() {
 }
 
 char* Packet::serialize() {
-  //Add 2 to the total message size for the terminator and separator
+  //Add to the total message size for the terminator and separators
   char *hostBuffer = new char[255];
   gethostname(hostBuffer, 255);
+  char *hostIp = get_host_ip();
   // TODO: Possible build this buffer in a function?
-  // TODO: Implement function to retrieve IP and append it after hostname
-  int bufferLen = strlen(this->action) + strlen(this->message) + strlen(hostBuffer) + 3;
+  int bufferLen = strlen(this->action) +
+                  strlen(this->message) +
+                  strlen(hostBuffer) +
+                  strlen(hostIp) +
+                  4;
   char *buffer = new char[bufferLen];
-  snprintf(buffer, bufferLen, "%s|%s\n%s", this->action, hostBuffer, this->message);
+  snprintf(buffer, bufferLen, "%s|%s|%s\n%s", this->action, hostBuffer, hostIp, this->message);
   buffer[bufferLen-1] = '\0';
   return buffer;
 }
