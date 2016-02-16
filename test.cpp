@@ -17,6 +17,6 @@ int main(int argc, char const *argv[]) {
 
    }
 
-   Packet::determinePacketCount();
+   printf("%d\n", Packet::getHeaderLen("UPDATE"));
   return 0;
 }

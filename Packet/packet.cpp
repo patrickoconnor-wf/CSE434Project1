@@ -5,6 +5,11 @@ Packet::Packet(const char *action, const char *message) {
   this->message = allocate(message);
 }
 
+int Packet::getHeaderLen(const char *action_type) {
+  Packet *empty = new Packet(action_type, "");
+  return strlen(empty->serialize());
+}
+
 char* Packet::allocate(const char *copyFrom) {
   int bufferLen = strlen(copyFrom) + 1;
   char *buffer = new char[bufferLen];

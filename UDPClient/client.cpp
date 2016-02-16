@@ -2,6 +2,7 @@
 #include <sys/socket.h> /* for socket(), connect(), sendto(), and recvfrom() */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_addr() */
 #include <stdlib.h>     /* for atoi() and exit() */
+#include <iostream>
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
 
@@ -9,6 +10,7 @@
 #include "../Constants/actions.h" /* Contains UPDATE, QUERY, EXIT constants */
 #include "../Packet/packet.h"
 #include "../Ports/ports.h"
+#include "../Utils/file_utils.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
 
@@ -42,7 +44,7 @@ int main(int argc, char *argv[])
     servIP = argv[1];           /* First arg: server IP address (dotted quad) */
     echoString = argv[2];       /* Second arg: string to echo */
 
-    if ((echoStringLen = strlen(sendPacket->serialize())) > ECHOMAX)  /* Check input length */
+    if ((echoStringLen = strlen(echoString)) > ECHOMAX)  /* Check input length */
         exitWithError("Echo word too long");
 
     // TODO: echoServPort should be a randomly selected port in valid range
@@ -61,13 +63,14 @@ int main(int argc, char *argv[])
     echoServAddr.sin_addr.s_addr = inet_addr(servIP);  /* Server IP address */
     echoServAddr.sin_port   = htons(echoServPort);     /* Server port */
 
-    // TODO: Determine raw length of what should be sent
+    // TODO: Determine raw length of what should be sent. AKA get the file system listing
+    getFileSystemContents();
 
     /* Send the string to the server */
     // TODO: Determine the number of packets to send so that the serialize is less than ECHOMAX
     if (sendto(sock,
-        sendPacket->serialize(),
-        strlen(sendPacket->serialize()),
+        echoString,
+        strlen(echoString),
         0,
         (struct sockaddr *) &echoServAddr,
         sizeof(echoServAddr)) != echoStringLen)

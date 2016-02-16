@@ -13,6 +13,7 @@ class Packet {
 
   public:
     Packet(const char *action, const char *message);
+    static int getHeaderLen(const char* action_type);
     char* getAction();
     char* getMessage();
     char* serialize();
