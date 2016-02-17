@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     echoServAddr.sin_addr.s_addr = inet_addr(servIP);  /* Server IP address */
     echoServAddr.sin_port   = htons(echoServPort);     /* Server port */
 
-    // TODO: Determine raw length of what should be sent. AKA get the file system listing
+    // TODO: Create a Packet from the File System Contents
     getFileSystemContents();
 
     /* Send the string to the server */
