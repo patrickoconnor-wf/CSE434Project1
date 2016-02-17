@@ -1,6 +1,9 @@
 # Created Executables
 server
 client
+test
 
 # ctags Generated File
 tags
+
+.DS_Store
