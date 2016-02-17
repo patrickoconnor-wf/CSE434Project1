@@ -9,13 +9,19 @@ class Packet {
   private:
     char *action;
     char *message;
+    char *hostName;
+    char *ipAddress;
+    int sequence;
     char* allocate(const char *copyFrom);
 
   public:
     Packet(const char *action, const char *message);
+    ~Packet();
     static int getHeaderLen(const char* action_type);
     char* getAction();
     char* getMessage();
+    char* getHostName();
+    char* getIpAddress();
     char* serialize();
     Packet* deserialize();
 };
