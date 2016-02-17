@@ -3,6 +3,17 @@
 Packet::Packet(const char *action, const char *message) {
   this->action = allocate(action);
   this->message = allocate(message);
+  this->hostName = new char[255];
+  gethostname(this->hostName, 255);
+  this->ipAddress = get_host_ip();
+  this->sequence = 0;
+}
+
+Packet::~Packet() {
+  delete [] this->action;
+  delete [] this->message;
+  delete [] this->hostName;
+  delete [] this->ipAddress;
 }
 
 int Packet::getHeaderLen(const char *action_type) {
@@ -26,19 +37,24 @@ char* Packet::getMessage() {
   return this->message;
 }
 
+char* Packet::getHostName() {
+  return this->hostName;
+}
+
+char* Packet::getIpAddress() {
+  return this->ipAddress;
+}
+
 char* Packet::serialize() {
   //Add to the total message size for the terminator and separators
-  char *hostBuffer = new char[255];
-  gethostname(hostBuffer, 255);
-  char *hostIp = get_host_ip();
   // TODO: Possible build this buffer in a function?
   int bufferLen = strlen(this->action) +
                   strlen(this->message) +
-                  strlen(hostBuffer) +
-                  strlen(hostIp) +
+                  strlen(this->hostName) +
+                  strlen(this->ipAddress) +
                   4;
   char *buffer = new char[bufferLen];
-  snprintf(buffer, bufferLen, "%s|%s|%s\n%s", this->action, hostBuffer, hostIp, this->message);
+  snprintf(buffer, bufferLen, "%s|%s|%s\n%s", this->action, this->hostName, this->ipAddress, this->message);
   buffer[bufferLen-1] = '\0';
   return buffer;
 }
