@@ -2,7 +2,10 @@
 #define __PACKET_DEFINED__
 #include <cstring>
 #include <cstdio>
+#include <string>
+#include <sstream>
 #include <unistd.h>
+#include <vector>
 #include "../Utils/network_utils.h"
 
 class Packet {
@@ -23,6 +26,8 @@ class Packet {
     char* getHostName();
     char* getIpAddress();
     char* serialize();
-    Packet* deserialize();
+    static Packet* deserialize(char *recv);
 };
+
+std::vector<std::string> split(const char *s, char delimiter);
 #endif
