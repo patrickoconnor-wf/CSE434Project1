@@ -13,16 +13,23 @@ const char* getFileSystemContents() {
     exit(1);
   }
 
-  char *listings_str = new char[5120];
+  std::string listings_str = "";
   struct dirent *dirp;
   while ((dirp = readdir(open)) != NULL) {
-      std::string filename = cwdBuffer;
-      filename += dirp->d_name;
-      int f_size = getFileSize(filename.c_str());
-      sprintf(listings_str, "%s|%d\n", dirp->d_name, f_size);
+    std::string filename = cwdBuffer;
+    filename += dirp->d_name;
+    if (stat(filename.c_str(), &filestat)) continue; // Populates filestat
+    if (S_ISDIR(filestat.st_mode)) continue; // Breaks loop if not file
+    int f_size = getFileSize(filename.c_str());
+
+    // This is a very ugly implementation but it means I don't have to
+    // allocate another C String just to use sprintf for formatting
+    listings_str += dirp->d_name;
+    listings_str += "|";
+    listings_str += std::to_string(f_size);
+    listings_str += "\n";
    }
-   printf("%s\n", listings_str);
-   return listings_str;
+   return listings_str.c_str();
 
 }
 
@@ -30,7 +37,7 @@ int getFileSize(const char *fileName) {
   std::ifstream file(fileName, std::ifstream::in | std::ifstream::binary);
 
   if (!file.good()) {
-    printf("%s\n", "File is not open. The given file size will be incorrect.");
+    printf("%s\n", "File is not in good state. The given file size will be incorrect.");
   }
 
   file.seekg(0, std::ios::end);
