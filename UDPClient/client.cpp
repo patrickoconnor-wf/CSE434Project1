@@ -64,16 +64,16 @@ int main(int argc, char *argv[])
     echoServAddr.sin_port   = htons(echoServPort);     /* Server port */
 
     // TODO: Create a Packet from the File System Contents
-    getFileSystemContents();
+    sendPacket = new Packet::Packet(UPDATE, getFileSystemContents());
 
     /* Send the string to the server */
     // TODO: Determine the number of packets to send so that the serialize is less than ECHOMAX
     if (sendto(sock,
-        echoString,
-        strlen(echoString),
+        sendPacket->serialize(),
+        strlen(sendPacket->serialize()),
         0,
         (struct sockaddr *) &echoServAddr,
-        sizeof(echoServAddr)) != echoStringLen)
+        sizeof(echoServAddr)) != strlen(sendPacket->serialize()))
           exitWithError("sendto() sent a different number of bytes than expected");
 
     /* Recv a response */
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
                                   ECHOMAX,
                                   0,
                                   (struct sockaddr *) &fromAddr,
-                                  &fromSize)) != echoStringLen)
+                                  &fromSize)) != strlen(sendPacket->serialize()))
         exitWithError("recvfrom() failed");
 
     if (echoServAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
