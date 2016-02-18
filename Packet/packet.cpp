@@ -1,4 +1,5 @@
 #include "Packet.h"
+#include <iostream>
 
 Packet::Packet(const char *action, const char *message) {
   this->action = allocate(action);
@@ -59,7 +60,29 @@ char* Packet::serialize() {
   return buffer;
 }
 
-Packet* Packet::deserialize() {
+Packet* Packet::deserialize(char *recv) {
   // TODO: Implement Deserialize
-  return new Packet("", "");
+  std::vector<std::string> packetVector = split(recv, '\n');
+  std::vector<std::string> headerVector = split(packetVector[0].c_str(), '|');
+  std::string messageString = "";
+
+  for(std::vector<std::string>::iterator it = ++packetVector.begin(); it != packetVector.end(); ++it) {
+    messageString += *it + "\n";
+  }
+  Packet *packet = new Packet(headerVector[0].c_str(), messageString.c_str());
+
+  return packet;
+}
+
+std::vector<std::string> split(const char *s, char delimiter) {
+
+  std::stringstream ss(s);
+  std::string entry;
+  std::vector<std::string> vector;
+
+  while (std::getline(ss, entry, delimiter)) {
+    vector.push_back(entry);
+  }
+  return vector;
+
 }
