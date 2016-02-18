@@ -30,13 +30,13 @@ run_server: compile_server
 	./server $(server_port)
 
 run_client: compile_client
-	./client 127.0.0.1 $(ACTION) $(server_port)
+	./client 127.0.0.1 $(ACTION)
 
 run_server_no_build:
 	./server $(server_port)
 
 run_client_no_build:
-	./client 127.0.0.1 $(ACTION) $(server_port)
+	./client 127.0.0.1 $(ACTION)
 
 compile_test:
 	clang++ --std=c++11 $(test_source_list) -o test

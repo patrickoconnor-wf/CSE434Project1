@@ -13,6 +13,7 @@
 #include "../Utils/file_utils.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
+#define SERVERPORT 4923 /* Server should always be on this port */
 
 void exitWithError(const char *errorMessage) /* External error handling function */
 {
@@ -25,7 +26,6 @@ int main(int argc, char *argv[])
     int sock;                        /* Socket descriptor */
     struct sockaddr_in echoServAddr; /* Echo server address */
     struct sockaddr_in fromAddr;     /* Source address of echo */
-    unsigned short echoServPort;     /* Echo server port */
     unsigned int fromSize;           /* In-out of address size for recvfrom() */
     char *servIP;                    /* IP address of server */
     char *echoString;                /* String to send to echo server */
@@ -35,9 +35,9 @@ int main(int argc, char *argv[])
     Packet *sendPacket;              /* A created Packet that will be sent */
     Packet *recvPacket;              /* A created Packet that was received */
 
-    if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
+    if ((argc < 1) || (argc > 3))    /* Test for correct number of arguments */
     {
-        fprintf(stderr,"Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
+        fprintf(stderr,"Usage: %s <Server IP>\n", argv[0]);
         exit(1);
     }
 
@@ -47,12 +47,6 @@ int main(int argc, char *argv[])
     if ((echoStringLen = strlen(echoString)) > ECHOMAX)  /* Check input length */
         exitWithError("Echo word too long");
 
-    // TODO: echoServPort should be a randomly selected port in valid range
-    if (argc == 4)
-        echoServPort = atoi(argv[3]);  /* Use given port, if any */
-    else
-        echoServPort = 7;  /* 7 is the well-known port for the echo service */
-
     /* Create a datagram/UDP socket */
     if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
         exitWithError("socket() failed");
@@ -61,9 +55,8 @@ int main(int argc, char *argv[])
     memset(&echoServAddr, 0, sizeof(echoServAddr));    /* Zero out structure */
     echoServAddr.sin_family = AF_INET;                 /* Internet addr family */
     echoServAddr.sin_addr.s_addr = inet_addr(servIP);  /* Server IP address */
-    echoServAddr.sin_port   = htons(echoServPort);     /* Server port */
+    echoServAddr.sin_port   = htons(SERVERPORT);     /* Server port */
 
-    // TODO: Create a Packet from the File System Contents
     sendPacket = new Packet::Packet(UPDATE, getFileSystemContents());
 
     /* Send the string to the server */
