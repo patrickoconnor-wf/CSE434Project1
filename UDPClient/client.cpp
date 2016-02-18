@@ -89,6 +89,11 @@ int main(int argc, char *argv[])
     echoBuffer[respStringLen] = '\0';
     printf("Received: %s\n", echoBuffer);    /* Print the echoed arg */
 
+    printf("%s\n", "Deserializing char * into Packet ...\n");
+    recvPacket = Packet::deserialize(echoBuffer);
+    printf("%s\n", "Serialized Packet output:");
+    printf("%s\n", recvPacket->serialize());
+
     close(sock);
     exit(0);
 }
