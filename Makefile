@@ -1,5 +1,5 @@
 server_source_list = UDPServer/server.cpp Ports/ports.cpp Packet/packet.cpp \
-										 Utils/network_utils.cpp Utils/file_utils.cpp
+										 Utils/network_utils.cpp Utils/file_utils.cpp ClientList/ClientList.cpp
 client_source_list = UDPClient/client.cpp Ports/ports.cpp Packet/packet.cpp \
 										 Utils/network_utils.cpp Utils/file_utils.cpp
 test_source_list = Ports/ports.cpp Packet/packet.cpp Utils/network_utils.cpp \
