@@ -69,6 +69,7 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   } else {
     /* Send received datagram back to the client */
     // TODO: If a non-valid action is recieved, should the packet be ignored?
+    printf("%s\n", "Client sent invalid action. Ignoring...");
     }
 }
 
