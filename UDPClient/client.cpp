@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
                                   ECHOMAX,
                                   0,
                                   (struct sockaddr *) &fromAddr,
-                                  &fromSize)) != strlen(sendPacket->serialize()))
+                                  &fromSize)) != strlen(echoBuffer))
         exitWithError("recvfrom() failed");
 
     if (echoServAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
