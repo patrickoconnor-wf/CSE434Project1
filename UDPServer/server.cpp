@@ -45,6 +45,14 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   } else if (strcmp(action, QUERY) == 0) {
     printf("Got QUERY\n");
     // TODO: Implement logic to find all clints with requested file(s)
+    Packet *sendPacket = new Packet::Packet(QUERYRESULT, "file1.txt\nfile2.txt"); // <- Dummy data
+    if (sendto(sock,
+               sendPacket->serialize(),
+               strlen(sendPacket->serialize()),
+               0,
+               (struct sockaddr *) &addr,
+               sizeof(addr)) != strlen(sendPacket->serialize()))
+                exitWithError("sendto() sent a different number of bytes than expected");
 
   } else if (strcmp(action, EXIT) == 0) {
     printf("Got EXIT\n");
