@@ -92,6 +92,18 @@ int main(int argc, char *argv[])
     }
 
     // TODO: Send a QUERY to find clients
+    sendPacket = new Packet::Packet(QUERY, ".");
+    if (sendto(sock,
+        sendPacket->serialize(),
+        strlen(sendPacket->serialize()),
+        0,
+        (struct sockaddr *) &echoServAddr,
+        sizeof(echoServAddr)) != strlen(sendPacket->serialize()))
+          exitWithError("sendto() sent a different number of bytes than expected");
+
+    // Hopefully recieve a QUERYRESULT packet
+
+
 
 
     /* null-terminate the received data */
