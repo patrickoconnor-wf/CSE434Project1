@@ -9,7 +9,11 @@
 #include "../Constants/actions.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
-
+struct Data_Table{
+    unsigned char * IPAddress;
+    char * Hostname;
+    char * FileName;
+};
 void exitWithError(const char *errorMessage) /* External error handling function */
 {
     perror(errorMessage);
@@ -67,6 +71,11 @@ int main(int argc, char *argv[])
 
         if (strcmp(echoBuffer, UPDATE) == 0) {
           printf("Got UPDATE\n");
+          Data_Table Table = new Data_Table;
+          Packet *newPacket = packet->deserialize(Words);
+          Table.HostName = newPacket->getHostName();
+          Table.IPAddress= newPacket->getIpAddress();
+
         } else if (strcmp(echoBuffer, QUERY) == 0) {
           printf("Got QUERY\n");
         } else if (strcmp(echoBuffer, EXIT) == 0) {
