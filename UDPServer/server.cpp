@@ -3,6 +3,7 @@
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
+#include <thread>       /* for thread shenanigans */
 #include <unistd.h>     /* for close() */
 #include <vector>
 #include <algorithm>
@@ -15,6 +16,7 @@
 
 /* Project Imports */
 #include "../Constants/actions.h"
+#include "../Packet/packet.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
 std::vector<ClientList*> Clients;
@@ -24,6 +26,59 @@ void exitWithError(const char *errorMessage) /* External error handling function
     exit(1);
 }
 
+<<<<<<< HEAD
+=======
+void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) {
+
+  Packet *recvPacket = Packet::deserialize(buffer);
+  char *action = recvPacket->getAction();
+  if (strcmp(action, UPDATE) == 0) {
+    printf("Got UPDATE\n");
+    // TODO: Implement data table logic
+    // Data_Table Table = new Data_Table;
+    // Packet *newPacket = packet->deserialize(Words);
+    // Table.HostName = newPacket->getHostName();
+    // Table.IPAddress= newPacket->getIpAddress();
+    Packet *sendPacket = new Packet::Packet(ACK, ACK);
+    if (sendto(sock,
+               sendPacket->serialize(),
+               strlen(sendPacket->serialize()),
+               0,
+               (struct sockaddr *) &addr,
+               sizeof(addr)) != strlen(sendPacket->serialize()))
+                exitWithError("sendto() sent a different number of bytes than expected");
+
+  } else if (strcmp(action, QUERY) == 0) {
+    printf("Got QUERY\n");
+    // TODO: Implement logic to find all clints with requested file(s)
+    Packet *sendPacket = new Packet::Packet(QUERYRESULT, "file1.txt\nfile2.txt"); // <- Dummy data
+    if (sendto(sock,
+               sendPacket->serialize(),
+               strlen(sendPacket->serialize()),
+               0,
+               (struct sockaddr *) &addr,
+               sizeof(addr)) != strlen(sendPacket->serialize()))
+                exitWithError("sendto() sent a different number of bytes than expected");
+
+  } else if (strcmp(action, EXIT) == 0) {
+    printf("Got EXIT\n");
+    // TODO: Handle client wanting to exit and delete it from data table
+    Packet *sendPacket = new Packet::Packet(ACK, "Client has been disconnected");
+    if (sendto(sock,
+               sendPacket->serialize(),
+               strlen(sendPacket->serialize()),
+               0,
+               (struct sockaddr *) &addr,
+               sizeof(addr)) != strlen(sendPacket->serialize()))
+                exitWithError("sendto() sent a different number of bytes than expected");
+
+  } else {
+    /* Send received datagram back to the client */
+    // TODO: If a non-valid action is recieved, should the packet be ignored?
+    printf("%s\n", "Client sent invalid action. Ignoring...");
+    }
+}
+>>>>>>> e9204c4e8aa4a6c806c19f1d5e5a7a9b97d426cb
 
 int main(int argc, char *argv[])
 {
@@ -74,6 +129,7 @@ int main(int argc, char *argv[])
 
         printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
+<<<<<<< HEAD
         if (strcmp(echoBuffer, UPDATE) == 0) {
           printf("Got UPDATE\n");
           Packet *newPacket = Packet::deserialize(echoBuffer);
@@ -108,6 +164,12 @@ int main(int argc, char *argv[])
                      sizeof(echoClntAddr)) != recvMsgSize)
                       exitWithError("sendto() sent a different number of bytes than expected");
           }
+=======
+        // Create thread to handle client
+        std::thread clientThread(handleClient, echoBuffer, sock, recvMsgSize, echoClntAddr);
+        // Let the thread run independently
+        clientThread.detach();
+>>>>>>> e9204c4e8aa4a6c806c19f1d5e5a7a9b97d426cb
 
         }
 
