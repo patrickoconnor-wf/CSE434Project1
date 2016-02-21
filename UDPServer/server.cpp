@@ -26,8 +26,6 @@ void exitWithError(const char *errorMessage) /* External error handling function
     exit(1);
 }
 
-<<<<<<< HEAD
-=======
 void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) {
 
   Packet *recvPacket = Packet::deserialize(buffer);
@@ -78,7 +76,6 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     printf("%s\n", "Client sent invalid action. Ignoring...");
     }
 }
->>>>>>> e9204c4e8aa4a6c806c19f1d5e5a7a9b97d426cb
 
 int main(int argc, char *argv[])
 {
@@ -129,47 +126,10 @@ int main(int argc, char *argv[])
 
         printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
-<<<<<<< HEAD
-        if (strcmp(echoBuffer, UPDATE) == 0) {
-          printf("Got UPDATE\n");
-          Packet *newPacket = Packet::deserialize(echoBuffer);
-          char* Files = newPacket->getMessage();
-         ClientList *clientList = new ClientList::ClientList(newPacket->getHostName(), newPacket->getIpAddress());
-          if(!Clients.empty())
-          {
-            if(std::find(Clients.begin(), Clients.end(), clientList) != Clients.end()) {
-
-            }
-            else {
-              Clients.push_back(clientList);
-            }
-          }
-          else
-          {
-            Clients.push_back(clientList);
-          }
-          char* Status = clientList->FormatFilesList(Files);
-
-        } else if (strcmp(echoBuffer, QUERY) == 0) {
-          printf("Got QUERY\n");
-        } else if (strcmp(echoBuffer, EXIT) == 0) {
-          printf("Got EXIT\n");
-        } else {
-          /* Send received datagram back to the client */
-          if (sendto(sock,
-                     echoBuffer,
-                     recvMsgSize,
-                     0,
-                     (struct sockaddr *) &echoClntAddr,
-                     sizeof(echoClntAddr)) != recvMsgSize)
-                      exitWithError("sendto() sent a different number of bytes than expected");
-          }
-=======
         // Create thread to handle client
         std::thread clientThread(handleClient, echoBuffer, sock, recvMsgSize, echoClntAddr);
         // Let the thread run independently
         clientThread.detach();
->>>>>>> e9204c4e8aa4a6c806c19f1d5e5a7a9b97d426cb
 
         }
 
