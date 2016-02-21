@@ -85,14 +85,23 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    /* null-terminate the received data */
-    echoBuffer[respStringLen] = '\0';
-    printf("Received: %s\n", echoBuffer);    /* Print the echoed arg */
-
-    printf("%s\n", "Deserializing char * into Packet ...\n");
+    // Confirm that the packet that was recieved is an ACK.
     recvPacket = Packet::deserialize(echoBuffer);
-    printf("%s\n", "Serialized Packet output:");
-    printf("%s\n", recvPacket->serialize());
+    if (strcmp(recvPacket->getAction(), ACK) != 0) {
+      exitWithError("Recieved invalid response from server. Expected ACK.");
+    }
+
+    // TODO: Send a QUERY to find clients
+
+
+    /* null-terminate the received data */
+    //echoBuffer[respStringLen] = '\0';
+    printf("Received: %s\n", recvPacket->serialize());    /* Print the echoed arg */
+
+    // printf("%s\n", "Deserializing char * into Packet ...\n");
+    // recvPacket = Packet::deserialize(echoBuffer);
+    // printf("%s\n", "Serialized Packet output:");
+    // printf("%s\n", recvPacket->serialize());
 
     close(sock);
     exit(0);
