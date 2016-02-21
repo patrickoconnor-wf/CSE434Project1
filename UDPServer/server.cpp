@@ -33,10 +33,24 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   if (strcmp(action, UPDATE) == 0) {
     printf("Got UPDATE\n");
     // TODO: Implement data table logic
-    // Data_Table Table = new Data_Table;
-    // Packet *newPacket = packet->deserialize(Words);
-    // Table.HostName = newPacket->getHostName();
-    // Table.IPAddress= newPacket->getIpAddress();
+    Packet *newPacket = Packet::deserialize(buffer);
+    char* Files = newPacket->getMessage();
+    ClientList *clientList = new ClientList::ClientList(newPacket->getHostName(), newPacket->getIpAddress());
+    if(!Clients.empty())
+    {
+      if(std::find(Clients.begin(), Clients.end(), clientList) != Clients.end()) {
+
+      }
+      else {
+        Clients.push_back(clientList);
+      }
+    }
+    else
+    {
+      Clients.push_back(clientList);
+    }
+   char* Status = clientList->FormatFilesList(Files);
+
     Packet *sendPacket = new Packet::Packet(ACK, ACK);
     if (sendto(sock,
                sendPacket->serialize(),
