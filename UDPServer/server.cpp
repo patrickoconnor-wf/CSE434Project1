@@ -3,6 +3,7 @@
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
+#include <thread>       /* for thread shenanigans */
 #include <unistd.h>     /* for close() */
 
 /* Project Imports */
@@ -18,6 +19,31 @@ void exitWithError(const char *errorMessage) /* External error handling function
 {
     perror(errorMessage);
     exit(1);
+}
+
+void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) {
+
+  if (strcmp(buffer, UPDATE) == 0) {
+    printf("Got UPDATE\n");
+    // Data_Table Table = new Data_Table;
+    // Packet *newPacket = packet->deserialize(Words);
+    // Table.HostName = newPacket->getHostName();
+    // Table.IPAddress= newPacket->getIpAddress();
+
+  } else if (strcmp(buffer, QUERY) == 0) {
+    printf("Got QUERY\n");
+  } else if (strcmp(buffer, EXIT) == 0) {
+    printf("Got EXIT\n");
+  } else {
+    /* Send received datagram back to the client */
+    if (sendto(sock,
+               buffer,
+               msgSize,
+               0,
+               (struct sockaddr *) &addr,
+               sizeof(addr)) != msgSize)
+                exitWithError("sendto() sent a different number of bytes than expected");
+    }
 }
 
 int main(int argc, char *argv[])
@@ -69,27 +95,10 @@ int main(int argc, char *argv[])
 
         printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
-        if (strcmp(echoBuffer, UPDATE) == 0) {
-          printf("Got UPDATE\n");
-          Data_Table Table = new Data_Table;
-          Packet *newPacket = packet->deserialize(Words);
-          Table.HostName = newPacket->getHostName();
-          Table.IPAddress= newPacket->getIpAddress();
-
-        } else if (strcmp(echoBuffer, QUERY) == 0) {
-          printf("Got QUERY\n");
-        } else if (strcmp(echoBuffer, EXIT) == 0) {
-          printf("Got EXIT\n");
-        } else {
-          /* Send received datagram back to the client */
-          if (sendto(sock,
-                     echoBuffer,
-                     recvMsgSize,
-                     0,
-                     (struct sockaddr *) &echoClntAddr,
-                     sizeof(echoClntAddr)) != recvMsgSize)
-                      exitWithError("sendto() sent a different number of bytes than expected");
-          }
+        // Create thread to handle client
+        std::thread clientThread(handleClient, echoBuffer, sock, recvMsgSize, echoClntAddr);
+        // Let the thread run independently
+        clientThread.detach();
 
         }
 
