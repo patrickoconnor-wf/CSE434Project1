@@ -4,21 +4,26 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
+#include <vector>
+#include <algorithm>
+#include "../Constants/actions.h" /* Contains UPDATE, QUERY, EXIT constants */
+#include "../Packet/packet.h"
+#include "../Ports/ports.h"
+#include "../Utils/file_utils.h"
+#include "../ClientList/ClientList.h"
+
 
 /* Project Imports */
 #include "../Constants/actions.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
-struct Data_Table{
-    unsigned char * IPAddress;
-    char * Hostname;
-    char * FileName;
-};
+std::vector<ClientList*> Clients;
 void exitWithError(const char *errorMessage) /* External error handling function */
 {
     perror(errorMessage);
     exit(1);
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -71,10 +76,23 @@ int main(int argc, char *argv[])
 
         if (strcmp(echoBuffer, UPDATE) == 0) {
           printf("Got UPDATE\n");
-          Data_Table Table = new Data_Table;
-          Packet *newPacket = packet->deserialize(Words);
-          Table.HostName = newPacket->getHostName();
-          Table.IPAddress= newPacket->getIpAddress();
+          Packet *newPacket = Packet::deserialize(echoBuffer);
+          char* Files = newPacket->getMessage();
+         ClientList *clientList = new ClientList::ClientList(newPacket->getHostName(), newPacket->getIpAddress());
+          if(!Clients.empty())
+          {
+            if(std::find(Clients.begin(), Clients.end(), clientList) != Clients.end()) {
+
+            }
+            else {
+              Clients.push_back(clientList);
+            }
+          }
+          else
+          {
+            Clients.push_back(clientList);
+          }
+          char* Status = clientList->FormatFilesList(Files);
 
         } else if (strcmp(echoBuffer, QUERY) == 0) {
           printf("Got QUERY\n");
