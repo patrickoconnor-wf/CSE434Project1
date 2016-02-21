@@ -5,4 +5,5 @@
 const char *UPDATE = "UPDATE";
 const char *QUERY = "QUERY";
 const char *EXIT = "EXIT";
+const char *ACK = "ACK";
 #endif
