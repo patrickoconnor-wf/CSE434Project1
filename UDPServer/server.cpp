@@ -8,6 +8,7 @@
 
 /* Project Imports */
 #include "../Constants/actions.h"
+#include "../Packet/packet.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
 struct Data_Table{
@@ -23,16 +24,19 @@ void exitWithError(const char *errorMessage) /* External error handling function
 
 void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) {
 
-  if (strcmp(buffer, UPDATE) == 0) {
+  Packet *recvPacket = Packet::deserialize(buffer);
+  char *action = recvPacket->getAction();
+  if (strcmp(action, UPDATE) == 0) {
     printf("Got UPDATE\n");
     // Data_Table Table = new Data_Table;
     // Packet *newPacket = packet->deserialize(Words);
     // Table.HostName = newPacket->getHostName();
     // Table.IPAddress= newPacket->getIpAddress();
 
-  } else if (strcmp(buffer, QUERY) == 0) {
+  } else if (strcmp(action, QUERY) == 0) {
     printf("Got QUERY\n");
-  } else if (strcmp(buffer, EXIT) == 0) {
+
+  } else if (strcmp(action, EXIT) == 0) {
     printf("Got EXIT\n");
   } else {
     /* Send received datagram back to the client */
