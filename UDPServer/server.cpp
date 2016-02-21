@@ -57,16 +57,18 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   } else if (strcmp(action, EXIT) == 0) {
     printf("Got EXIT\n");
     // TODO: Handle client wanting to exit and delete it from data table
+    Packet *sendPacket = new Packet::Packet(ACK, "Client has been disconnected");
+    if (sendto(sock,
+               sendPacket->serialize(),
+               strlen(sendPacket->serialize()),
+               0,
+               (struct sockaddr *) &addr,
+               sizeof(addr)) != strlen(sendPacket->serialize()))
+                exitWithError("sendto() sent a different number of bytes than expected");
+
   } else {
     /* Send received datagram back to the client */
     // TODO: If a non-valid action is recieved, should the packet be ignored?
-    if (sendto(sock,
-               buffer,
-               msgSize,
-               0,
-               (struct sockaddr *) &addr,
-               sizeof(addr)) != msgSize)
-                exitWithError("sendto() sent a different number of bytes than expected");
     }
 }
 
