@@ -20,12 +20,23 @@
 
 #define ECHOMAX 255     /* Longest string to echo */
 std::vector<ClientList*> Clients;
+std::vector<ClientList*>::iterator iter;
+
 void exitWithError(const char *errorMessage) /* External error handling function */
 {
     perror(errorMessage);
     exit(1);
 }
-
+char* getCLientsByFileName (char *FileName){
+  static char* message;
+  for(iter = Clients.begin(); iter != Clients.end(); iter++) {
+      if((*iter)->FileFoundInClient(FileName))
+      {
+        *message =  *message + *((*iter)->getHostName());
+      }
+  }
+      return message;
+}
 void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) {
 
   Packet *recvPacket = Packet::deserialize(buffer);
@@ -63,7 +74,9 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   } else if (strcmp(action, QUERY) == 0) {
     printf("Got QUERY\n");
     // TODO: Implement logic to find all clints with requested file(s)
-    Packet *sendPacket = new Packet::Packet(QUERYRESULT, "file1.txt\nfile2.txt"); // <- Dummy data
+    char* Files = recvPacket->getMessage();
+    char *packetMessage =  getCLientsByFileName(Files);
+    Packet *sendPacket = new Packet::Packet(QUERYRESULT, packetMessage); // <- Dummy data
     if (sendto(sock,
                sendPacket->serialize(),
                strlen(sendPacket->serialize()),

@@ -15,5 +15,9 @@ class ClientList {
     ClientList(char *hostName,char *ipAddress);
     ~ClientList();
     char* FormatFilesList(char *message);
+    char* getIpAddress();
+    char* getHostName();
+    bool FileFoundInClient(char *File);
+
 
   };
