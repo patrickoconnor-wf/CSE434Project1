@@ -15,28 +15,13 @@
 #include "../Packet/packet.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
-std::vector<ClientInfo> clients;
 
 void exitWithError(const char *errorMessage) /* External error handling function */
 {
     perror(errorMessage);
     exit(1);
 }
-std::string getClientsByFileName (const char *fileName){
-  std::string message = "";
-  for(std::vector<ClientInfo>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
-      if(iter->fileFoundInClient(fileName))
-      {
-        std::cout << iter->getHostName();
-        //message += message + iter->getHostName();
-      }
-  }
-      return message.c_str();
-}
-void removeClient(char* HostName, char *IpAddress)
-{
-  //Clients.erase(std::remove(Clients.begin(),Clients.end(),)Clients.end());
-}
+
 void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) {
 
   Packet *recvPacket = Packet::deserialize(buffer);
@@ -46,7 +31,7 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     // TODO: Implement data table logic
     char* Files = recvPacket->getMessage();
     bool updated = false;
-    for(std::vector<ClientInfo>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
+    for(std::vector<ClientInfo>::iterator iter = ClientInfo::getClients().begin(); iter != ClientInfo::getClients().end(); iter++) {
       if (strcmp(recvPacket->getHostName(), iter->getHostName()) == 0 && strcmp(recvPacket->getIpAddress(), iter->getIpAddress()) == 0) {
         // TODO: Do the update in the vector
         updated = true;
@@ -55,7 +40,7 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     }
     if (!updated) {
       ClientInfo *clientInfo = new ClientInfo::ClientInfo(recvPacket->getHostName(), recvPacket->getIpAddress());
-      clients.push_back(*clientInfo);
+      ClientInfo::getClients().push_back(*clientInfo);
     }
   // TODO: Figure out where this fits
   //  char* Status = ClientInfo->formatFilesList(Files);
@@ -71,9 +56,9 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
 
   } else if (strcmp(action, QUERY) == 0) {
     printf("Got QUERY\n");
-    // TODO: Implement logic to find all clints with requested file(s)
+    // TODO: Implement logic to find all clients with requested file(s)
     char *files = recvPacket->getMessage();
-    std::string packetMessage = getClientsByFileName(files);
+    std::string packetMessage = ClientInfo::getClientsByFileName(files);
     Packet *sendPacket = new Packet::Packet(QUERYRESULT, packetMessage.c_str()); // <- Dummy data
     if (sendto(sock,
                sendPacket->serialize(),
@@ -88,7 +73,7 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     // TODO: Handle client wanting to exit and delete it from data table
     char* exitingHost = recvPacket->getHostName();
     char* exitingIP = recvPacket->getIpAddress();
-    removeClient(exitingHost, exitingIP);
+    ClientInfo::removeClient(exitingHost, exitingIP);
     Packet *sendPacket = new Packet::Packet(ACK, "Client has been disconnected");
     if (sendto(sock,
                sendPacket->serialize(),
