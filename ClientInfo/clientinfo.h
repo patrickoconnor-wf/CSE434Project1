@@ -1,4 +1,8 @@
+#ifndef __CLIENTINFO_INCLUDED__
+#define __CLIENTINFO_INCLUDED__
+
 #include <cstdio>
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <unistd.h>
@@ -11,13 +15,16 @@ class ClientInfo {
     char *hostName;
     char *ipAddress;
     std::vector<std::string> fileNames;
+    static std::vector<ClientInfo> clients;
   public:
     ClientInfo(char *hostName,char *ipAddress);
     ~ClientInfo();
     char* formatFilesList(char *message);
     char* getIpAddress();
     char* getHostName();
+    std::vector<ClientInfo> getClients();
     bool fileFoundInClient(const char *File);
-
-
+    static std::string getClientsByFileName(const char *fileName);
+    static void removeClient(char* HostName, char *IpAddress);
   };
+#endif
