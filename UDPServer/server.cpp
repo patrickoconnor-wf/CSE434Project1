@@ -19,23 +19,23 @@
 #include "../Packet/packet.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
-std::vector<ClientList*> Clients;
-std::vector<ClientList*>::iterator iter;
+std::vector<ClientList> clients;
 
 void exitWithError(const char *errorMessage) /* External error handling function */
 {
     perror(errorMessage);
     exit(1);
 }
-char* getCLientsByFileName (char *FileName){
-  static char* message;
-  for(iter = Clients.begin(); iter != Clients.end(); iter++) {
-      if((*iter)->FileFoundInClient(FileName))
+std::string getClientsByFileName (const char *fileName){
+  std::string message = "";
+  for(std::vector<ClientList>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
+      if(iter->fileFoundInClient(fileName))
       {
-        *message =  *message + *((*iter)->getHostName());
+        std::cout << iter->getHostName();
+        //message += message + iter->getHostName();
       }
   }
-      return message;
+      return message.c_str();
 }
 void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) {
 
@@ -44,23 +44,22 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   if (strcmp(action, UPDATE) == 0) {
     printf("Got UPDATE\n");
     // TODO: Implement data table logic
-    Packet *newPacket = Packet::deserialize(buffer);
-    char* Files = newPacket->getMessage();
-    ClientList *clientList = new ClientList::ClientList(newPacket->getHostName(), newPacket->getIpAddress());
-    if(!Clients.empty())
-    {
-      if(std::find(Clients.begin(), Clients.end(), clientList) != Clients.end()) {
-
-      }
-      else {
-        Clients.push_back(clientList);
-      }
-    }
-    else
-    {
-      Clients.push_back(clientList);
-    }
-   char* Status = clientList->FormatFilesList(Files);
+    char* Files = recvPacket->getMessage();
+    ClientList *clientList = new ClientList::ClientList(recvPacket->getHostName(), recvPacket->getIpAddress());
+    // if(!clients.empty())
+    // {
+    //   if(std::find(clients.begin(), clients.end(), clientList) != clients.end()) {
+    //
+    //   }
+    //   else {
+    //     clients.push_back(*clientList);
+    //   }
+    // }
+    // else
+    // {
+    //   clients.push_back(*clientList);
+    // }
+   char* Status = clientList->formatFilesList(Files);
 
     Packet *sendPacket = new Packet::Packet(ACK, ACK);
     if (sendto(sock,
@@ -74,9 +73,9 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   } else if (strcmp(action, QUERY) == 0) {
     printf("Got QUERY\n");
     // TODO: Implement logic to find all clints with requested file(s)
-    char* Files = recvPacket->getMessage();
-    char *packetMessage =  getCLientsByFileName(Files);
-    Packet *sendPacket = new Packet::Packet(QUERYRESULT, packetMessage); // <- Dummy data
+    char *files = recvPacket->getMessage();
+    std::string packetMessage = getClientsByFileName(files);
+    Packet *sendPacket = new Packet::Packet(QUERYRESULT, packetMessage.c_str()); // <- Dummy data
     if (sendto(sock,
                sendPacket->serialize(),
                strlen(sendPacket->serialize()),
