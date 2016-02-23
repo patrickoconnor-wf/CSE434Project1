@@ -102,7 +102,26 @@ int main(int argc, char *argv[])
           exitWithError("sendto() sent a different number of bytes than expected");
 
     // Hopefully recieve a QUERYRESULT packet
+    fromSize = sizeof(fromAddr);
+    if ((respStringLen = recvfrom(sock,
+                                  echoBuffer,
+                                  ECHOMAX,
+                                  0,
+                                  (struct sockaddr *) &fromAddr,
+                                  &fromSize)) != strlen(echoBuffer))
+        exitWithError("recvfrom() failed");
 
+    if (echoServAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
+    {
+        fprintf(stderr,"Error: received a packet from unknown source.\n");
+        exit(1);
+    }
+
+    // Confirm that the packet that was recieved is a QUERYRESULT.
+    recvPacket = Packet::deserialize(echoBuffer);
+    if (strcmp(recvPacket->getAction(), QUERYRESULT) != 0) {
+      exitWithError("Recieved invalid response from server. Expected ACK.");
+    }
 
 
 
