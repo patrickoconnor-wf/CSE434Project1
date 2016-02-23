@@ -1,25 +1,21 @@
-#include <stdio.h>      /* for printf() and fprintf() */
-#include <sys/socket.h> /* for socket() and bind() */
+#include <algorithm>    /* for std::find */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
+#include <iostream>
+#include <stdio.h>      /* for printf() and fprintf() */
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
+#include <sys/socket.h> /* for socket() and bind() */
 #include <thread>       /* for thread shenanigans */
 #include <unistd.h>     /* for close() */
 #include <vector>
-#include <algorithm>
-#include "../Constants/actions.h" /* Contains UPDATE, QUERY, EXIT constants */
-#include "../Packet/packet.h"
-#include "../Ports/ports.h"
-#include "../Utils/file_utils.h"
-#include "../ClientList/ClientList.h"
-
 
 /* Project Imports */
+#include "../ClientInfo/clientinfo.h"
 #include "../Constants/actions.h"
 #include "../Packet/packet.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
-std::vector<ClientList> clients;
+std::vector<ClientInfo> clients;
 
 void exitWithError(const char *errorMessage) /* External error handling function */
 {
@@ -28,7 +24,7 @@ void exitWithError(const char *errorMessage) /* External error handling function
 }
 std::string getClientsByFileName (const char *fileName){
   std::string message = "";
-  for(std::vector<ClientList>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
+  for(std::vector<ClientInfo>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
       if(iter->fileFoundInClient(fileName))
       {
         std::cout << iter->getHostName();
@@ -49,28 +45,8 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     printf("Got UPDATE\n");
     // TODO: Implement data table logic
     char* Files = recvPacket->getMessage();
-    // if(!clients.empty())
-    // {
-    //   //Testing
-    //   for(std::vector<ClientList>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
-    //         printf("This is the HostName being added %s",iter->getHostName());
-    //
-    //   }
-    //   //EndTesting
-    //   if(std::find(clients.begin(), clients.end(), *clientList) != clients.end()) {
-    //
-    //   }
-    //   else {
-    //     clients.push_back(*clientList);
-    //   }
-    // }
-    // else
-    // {
-    //   clients.push_back(*clientList);
-    // }
-
     bool updated = false;
-    for(std::vector<ClientList>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
+    for(std::vector<ClientInfo>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
       if (strcmp(recvPacket->getHostName(), iter->getHostName()) == 0 && strcmp(recvPacket->getIpAddress(), iter->getIpAddress()) == 0) {
         // TODO: Do the update in the vector
         updated = true;
@@ -78,11 +54,11 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
       }
     }
     if (!updated) {
-      ClientList *clientList = new ClientList::ClientList(recvPacket->getHostName(), recvPacket->getIpAddress());
-      clients.push_back(*clientList);
+      ClientInfo *clientInfo = new ClientInfo::ClientInfo(recvPacket->getHostName(), recvPacket->getIpAddress());
+      clients.push_back(*clientInfo);
     }
   // TODO: Figure out where this fits
-  //  char* Status = clientList->formatFilesList(Files);
+  //  char* Status = ClientInfo->formatFilesList(Files);
 
     Packet *sendPacket = new Packet::Packet(ACK, ACK);
     if (sendto(sock,
