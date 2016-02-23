@@ -22,7 +22,7 @@ class ClientInfo {
     char* formatFilesList(char *message);
     char* getIpAddress();
     char* getHostName();
-    std::vector<ClientInfo> getClients();
+    static std::vector<ClientInfo> getClients();
     bool fileFoundInClient(const char *File);
     static std::string getClientsByFileName(const char *fileName);
     static void removeClient(char* HostName, char *IpAddress);
