@@ -49,27 +49,40 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     printf("Got UPDATE\n");
     // TODO: Implement data table logic
     char* Files = recvPacket->getMessage();
-    ClientList *clientList = new ClientList::ClientList(recvPacket->getHostName(), recvPacket->getIpAddress());
-    if(!Clients.empty())
-    {
-      //Testing
-      for(iter = Clients.begin(); iter != Clients.end(); iter++) {
-            printf("This is the HostName being added %s",(*iter)->getHostName());
+    // if(!clients.empty())
+    // {
+    //   //Testing
+    //   for(std::vector<ClientList>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
+    //         printf("This is the HostName being added %s",iter->getHostName());
+    //
+    //   }
+    //   //EndTesting
+    //   if(std::find(clients.begin(), clients.end(), *clientList) != clients.end()) {
+    //
+    //   }
+    //   else {
+    //     clients.push_back(*clientList);
+    //   }
+    // }
+    // else
+    // {
+    //   clients.push_back(*clientList);
+    // }
 
-      }
-      //EndTesting
-      if(std::find(Clients.begin(), Clients.end(), clientList) != Clients.end()) {
-
-      }
-      else {
-        Clients.push_back(clientList);
+    bool updated = false;
+    for(std::vector<ClientList>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
+      if (strcmp(recvPacket->getHostName(), iter->getHostName()) == 0 && strcmp(recvPacket->getIpAddress(), iter->getIpAddress()) == 0) {
+        // TODO: Do the update in the vector
+        updated = true;
+        break;
       }
     }
-    else
-    {
-      Clients.push_back(clientList);
+    if (!updated) {
+      ClientList *clientList = new ClientList::ClientList(recvPacket->getHostName(), recvPacket->getIpAddress());
+      clients.push_back(*clientList);
     }
-   char* Status = clientList->formatFilesList(Files);
+  // TODO: Figure out where this fits
+  //  char* Status = clientList->formatFilesList(Files);
 
     Packet *sendPacket = new Packet::Packet(ACK, ACK);
     if (sendto(sock,
