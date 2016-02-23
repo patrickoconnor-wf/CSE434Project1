@@ -13,7 +13,7 @@ ClientList::~ClientList() {
   delete [] this->hostName;
   delete [] this->ipAddress;
 }
-char* ClientList::FormatFilesList (char *message){
+char* ClientList::formatFilesList (char *message){
   std::vector<std::string> FileNames = split(message, ' ');
   this->fileNames = FileNames;
   static char ch[] = "ACK";
@@ -26,7 +26,7 @@ char* ClientList::getHostName() {
 char* ClientList::getIpAddress() {
   return this->ipAddress;
 }
-bool ClientList::FileFoundInClient(char * FileBeingSearched){
+bool ClientList::fileFoundInClient(const char *FileBeingSearched){
   bool Found = false ;
   std::string sthisFileName = std::string(FileBeingSearched);
     /* data */

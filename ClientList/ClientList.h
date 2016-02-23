@@ -14,10 +14,10 @@ class ClientList {
   public:
     ClientList(char *hostName,char *ipAddress);
     ~ClientList();
-    char* FormatFilesList(char *message);
+    char* formatFilesList(char *message);
     char* getIpAddress();
     char* getHostName();
-    bool FileFoundInClient(char *File);
+    bool fileFoundInClient(const char *File);
 
 
   };
