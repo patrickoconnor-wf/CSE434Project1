@@ -37,6 +37,10 @@ std::string getClientsByFileName (const char *fileName){
   }
       return message.c_str();
 }
+void removeClient(char* HostName, char *IpAddress)
+{
+  //Clients.erase(std::remove(Clients.begin(),Clients.end(),)Clients.end());
+}
 void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) {
 
   Packet *recvPacket = Packet::deserialize(buffer);
@@ -46,19 +50,25 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     // TODO: Implement data table logic
     char* Files = recvPacket->getMessage();
     ClientList *clientList = new ClientList::ClientList(recvPacket->getHostName(), recvPacket->getIpAddress());
-    // if(!clients.empty())
-    // {
-    //   if(std::find(clients.begin(), clients.end(), clientList) != clients.end()) {
-    //
-    //   }
-    //   else {
-    //     clients.push_back(*clientList);
-    //   }
-    // }
-    // else
-    // {
-    //   clients.push_back(*clientList);
-    // }
+    if(!Clients.empty())
+    {
+      //Testing
+      for(iter = Clients.begin(); iter != Clients.end(); iter++) {
+            printf("This is the HostName being added %s",(*iter)->getHostName());
+
+      }
+      //EndTesting
+      if(std::find(Clients.begin(), Clients.end(), clientList) != Clients.end()) {
+
+      }
+      else {
+        Clients.push_back(clientList);
+      }
+    }
+    else
+    {
+      Clients.push_back(clientList);
+    }
    char* Status = clientList->formatFilesList(Files);
 
     Packet *sendPacket = new Packet::Packet(ACK, ACK);
@@ -87,6 +97,9 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   } else if (strcmp(action, EXIT) == 0) {
     printf("Got EXIT\n");
     // TODO: Handle client wanting to exit and delete it from data table
+    char* exitingHost = recvPacket->getHostName();
+    char* exitingIP = recvPacket->getIpAddress();
+    removeClient(exitingHost, exitingIP);
     Packet *sendPacket = new Packet::Packet(ACK, "Client has been disconnected");
     if (sendto(sock,
                sendPacket->serialize(),
