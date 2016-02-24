@@ -33,7 +33,7 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     bool updated = false;
     for(std::vector<ClientInfo>::iterator iter = ClientInfo::getClients().begin(); iter != ClientInfo::getClients().end(); iter++) {
       if (strcmp(recvPacket->getHostName(), iter->getHostName()) == 0 && strcmp(recvPacket->getIpAddress(), iter->getIpAddress()) == 0) {
-        // TODO: Do the update in the vector
+        iter->formatFilesList(Files);
         updated = true;
         break;
       }
@@ -41,9 +41,8 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     if (!updated) {
       ClientInfo *clientInfo = new ClientInfo::ClientInfo(recvPacket->getHostName(), recvPacket->getIpAddress());
       ClientInfo::getClients().push_back(*clientInfo);
+      clientInfo->formatFilesList(Files);
     }
-  // TODO: Figure out where this fits
-  //  char* Status = ClientInfo->formatFilesList(Files);
 
     Packet *sendPacket = new Packet::Packet(ACK, ACK);
     if (sendto(sock,
@@ -57,8 +56,12 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   } else if (strcmp(action, QUERY) == 0) {
     printf("Got QUERY\n");
     // TODO: Implement logic to find all clients with requested file(s)
-    char *files = recvPacket->getMessage();
-    std::string packetMessage = ClientInfo::getClientsByFileName(files);
+    std::vector<std::string> FilesVector = split(recvPacket->getMessage(), ' ');
+    std::string packetMessage = "";
+    for(std::vector<std::string>::iterator iter = FilesVector.begin(); iter != FilesVector.end(); iter++) {
+      packetMessage = packetMessage + *iter + "|" + ClientInfo::getClientsByFileName(*iter) + "\n";
+      }
+
     Packet *sendPacket = new Packet::Packet(QUERYRESULT, packetMessage.c_str()); // <- Dummy data
     if (sendto(sock,
                sendPacket->serialize(),

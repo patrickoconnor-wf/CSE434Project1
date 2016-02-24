@@ -11,11 +11,9 @@ ClientInfo::ClientInfo(char *hostName, char *ipAddress ) {
 
 ClientInfo::~ClientInfo() {}
 
-char* ClientInfo::formatFilesList (char *message){
+void ClientInfo::formatFilesList (char *message){
   std::vector<std::string> FileNames = split(message, ' ');
   this->fileNames = FileNames;
-  static char ch[] = "ACK";
-      return ch;
 }
 
 char* ClientInfo::getHostName() {
@@ -30,29 +28,40 @@ std::vector<ClientInfo> ClientInfo::getClients() {
   return clients;
 }
 
-bool ClientInfo::fileFoundInClient(const char *FileBeingSearched){
+bool ClientInfo::fileFoundInClient(std::string FileBeingSearched){
   bool Found = false;
-  std::string sthisFileName = std::string(FileBeingSearched);
     /* data */
-  if(std::find(this->fileNames.begin(), this->fileNames.end(), sthisFileName) != this->fileNames.end()) {
+  if(std::find(this->fileNames.begin(), this->fileNames.end(), FileBeingSearched) != this->fileNames.end()) {
    Found = true;
   }
   return Found;
 }
 
-std::string ClientInfo::getClientsByFileName(const char *fileName){
+std::string ClientInfo::getClientsByFileName(std::string fileName){
   std::string message = "";
-  for(std::vector<ClientInfo>::iterator iter = clients.begin(); iter != clients.end(); iter++) {
+  for(std::vector<ClientInfo>::iterator iter = ClientInfo::getClients().begin(); iter != ClientInfo::getClients().end(); iter++) {
       if(iter->fileFoundInClient(fileName))
       {
         std::cout << iter->getHostName();
+        message = message + std::string(iter->getIpAddress()) + " ";
         //message += message + iter->getHostName();
       }
   }
-      return message.c_str();
+      return message;
 }
+bool ClientInfo::removeClient(char* HostName, char *IpAddress)
+{ int i = 0;
+  bool deleted = false;
+  for(std::vector<ClientInfo>::iterator iter = ClientInfo::getClients().begin(); iter != ClientInfo::getClients().end(); iter++) {
+    if (strcmp(HostName, iter->getHostName()) == 0 && strcmp(IpAddress, iter->getIpAddress()) == 0) {
+      std::cout << iter->getHostName();
+      clients.erase (clients.begin()+i);
+      deleted = true;
+      break;
+    }
+    i++;
+  }
+return deleted;
 
-void ClientInfo::removeClient(char* HostName, char *IpAddress)
-{
   //Clients.erase(std::remove(Clients.begin(),Clients.end(),)Clients.end());
 }

@@ -19,12 +19,12 @@ class ClientInfo {
   public:
     ClientInfo(char *hostName,char *ipAddress);
     ~ClientInfo();
-    char* formatFilesList(char *message);
+    void formatFilesList(char *message);
     char* getIpAddress();
     char* getHostName();
     static std::vector<ClientInfo> getClients();
-    bool fileFoundInClient(const char *File);
-    static std::string getClientsByFileName(const char *fileName);
-    static void removeClient(char* HostName, char *IpAddress);
+    bool fileFoundInClient(std::string File);
+    static std::string getClientsByFileName(std::string fileName);
+    static bool removeClient(char* HostName, char *IpAddress);
   };
 #endif
