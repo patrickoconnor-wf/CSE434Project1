@@ -25,6 +25,10 @@ void exitWithError(const char *errorMessage) /* External error handling function
 void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) {
 
   Packet *recvPacket = Packet::deserialize(buffer);
+
+  //Clear the buffer because we no longer need it.
+  memset(buffer, 0, strlen(buffer));
+
   char *action = recvPacket->getAction();
   if (strcmp(action, UPDATE) == 0) {
     printf("Got UPDATE\n");
@@ -56,9 +60,11 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   } else if (strcmp(action, QUERY) == 0) {
     printf("Got QUERY\n");
     // TODO: Implement logic to find all clients with requested file(s)
-    std::vector<std::string> FilesVector = split(recvPacket->getMessage(), ' ');
+    std::cout << recvPacket->getMessage() << std::endl;
+    std::vector<std::string> filesVector = split(recvPacket->getMessage(), '\n');
     std::string packetMessage = "";
-    for(std::vector<std::string>::iterator iter = FilesVector.begin(); iter != FilesVector.end(); iter++) {
+    for(auto iter = filesVector.begin(); iter != filesVector.end(); iter++) {
+      std::cout << *iter << std::endl;
       packetMessage = packetMessage + *iter + "|" + ClientInfo::getClientsByFileName(*iter) + "\n";
       }
 
@@ -99,7 +105,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in echoServAddr; /* Local address */
     struct sockaddr_in echoClntAddr; /* Client address */
     unsigned int cliAddrLen;         /* Length of incoming message */
-    char echoBuffer[ECHOMAX];        /* Buffer for echo string */
+    char echoBuffer[ECHOMAX];                /* Buffer for echo string */
     unsigned short echoServPort;     /* Server port */
     int recvMsgSize;                 /* Size of received message */
 
@@ -142,6 +148,7 @@ int main(int argc, char *argv[])
 
         printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
+        std::cout << echoBuffer << std::endl;
         // Create thread to handle client
         std::thread clientThread(handleClient, echoBuffer, sock, recvMsgSize, echoClntAddr);
         // Let the thread run independently

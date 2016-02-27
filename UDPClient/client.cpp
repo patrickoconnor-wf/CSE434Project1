@@ -87,12 +87,12 @@ int main(int argc, char *argv[])
 
     // Confirm that the packet that was recieved is an ACK.
     recvPacket = Packet::deserialize(echoBuffer);
+    memset(echoBuffer, 0, strlen(echoBuffer));
     if (strcmp(recvPacket->getAction(), ACK) != 0) {
       exitWithError("Recieved invalid response from server. Expected ACK.");
     }
 
-    // TODO: Send a QUERY to find clients
-    sendPacket = new Packet::Packet(QUERY, ".");
+    sendPacket = new Packet::Packet(QUERY, "text.txt");
     if (sendto(sock,
         sendPacket->serialize(),
         strlen(sendPacket->serialize()),
@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
 
     // Confirm that the packet that was recieved is a QUERYRESULT.
     recvPacket = Packet::deserialize(echoBuffer);
+    memset(echoBuffer, 0, strlen(echoBuffer));
     if (strcmp(recvPacket->getAction(), QUERYRESULT) != 0) {
       exitWithError("Recieved invalid response from server. Expected ACK.");
     }
