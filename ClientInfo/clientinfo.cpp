@@ -11,9 +11,16 @@ ClientInfo::ClientInfo(char *hostName, char *ipAddress ) {
 
 ClientInfo::~ClientInfo() {}
 
-void ClientInfo::formatFilesList (char *message){
-  std::vector<std::string> FileNames = split(message, ' ');
-  this->fileNames = FileNames;
+void ClientInfo::formatFilesList (const char *message){
+
+  std::vector<std::string> files = split(message, '\n');
+  // Erase what was in the fileNames vector
+  std::fill(this->fileNames.begin(), this->fileNames.end(), "");
+  // Extract file names without '|' delimeter
+  for (auto fileName = files.begin(); fileName != files.end(); fileName++) {
+    std::vector<std::string> temp = split(fileName->c_str(), '|');
+    this->fileNames.push_back(temp[0]);
+  }
 }
 
 char* ClientInfo::getHostName() {
@@ -28,6 +35,10 @@ std::vector<ClientInfo> ClientInfo::getClients() {
   return clients;
 }
 
+void ClientInfo::addClient(ClientInfo *info) {
+  clients.push_back(*info);
+}
+
 bool ClientInfo::fileFoundInClient(std::string FileBeingSearched){
   bool Found = false;
     /* data */
@@ -39,15 +50,32 @@ bool ClientInfo::fileFoundInClient(std::string FileBeingSearched){
 
 std::string ClientInfo::getClientsByFileName(std::string fileName){
   std::string message = "";
-  for(std::vector<ClientInfo>::iterator iter = ClientInfo::getClients().begin(); iter != ClientInfo::getClients().end(); iter++) {
-      if(iter->fileFoundInClient(fileName))
-      {
-        std::cout << iter->getHostName();
-        message = message + std::string(iter->getIpAddress()) + " ";
-        //message += message + iter->getHostName();
+
+  for(auto iter = clients.begin(); iter != clients.end(); iter++) {
+    // This flag is used to add the ipaddress if the filename being added is the
+    // first file for the client being searched.
+    bool firstFileAdded = true;
+    bool wasUpdated = false;
+      for(auto clientFile = iter->fileNames.begin(); clientFile != iter->fileNames.end(); clientFile++) {
+        std::cout << *clientFile << std::endl;
+        if (fileName == *clientFile) {
+          wasUpdated = true;
+          if (firstFileAdded) {
+            message += iter->getIpAddress();
+            message += "|" + *clientFile;
+            firstFileAdded = false;
+          }
+          else {
+            message += " " + *clientFile;
+          }
+        }
+        if (wasUpdated) {
+          message += "\n"; // Add a newline if the message was updated
+          wasUpdated = false;
+        }
       }
   }
-      return message;
+  return message;
 }
 bool ClientInfo::removeClient(char* HostName, char *IpAddress)
 { int i = 0;
