@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
       exitWithError("Recieved invalid response from server. Expected ACK.");
     }
 
-    sendPacket = new Packet::Packet(QUERY, "text.txt");
+    sendPacket = new Packet::Packet(QUERY, "text.txt\ntext2.txt");
     if (sendto(sock,
         sendPacket->serialize(),
         strlen(sendPacket->serialize()),
