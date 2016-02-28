@@ -35,7 +35,7 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     // TODO: Implement data table logic
     char* Files = recvPacket->getMessage();
     bool updated = false;
-    for(std::vector<ClientInfo>::iterator iter = ClientInfo::getClients().begin(); iter != ClientInfo::getClients().end(); iter++) {
+    for(auto iter = ClientInfo::getClients().begin(); iter != ClientInfo::getClients().end(); iter++) {
       if (strcmp(recvPacket->getHostName(), iter->getHostName()) == 0 && strcmp(recvPacket->getIpAddress(), iter->getIpAddress()) == 0) {
         iter->formatFilesList(Files);
         updated = true;
@@ -44,8 +44,8 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
     }
     if (!updated) {
       ClientInfo *clientInfo = new ClientInfo::ClientInfo(recvPacket->getHostName(), recvPacket->getIpAddress());
-      ClientInfo::getClients().push_back(*clientInfo);
       clientInfo->formatFilesList(Files);
+      ClientInfo::addClient(clientInfo);
     }
 
     Packet *sendPacket = new Packet::Packet(ACK, ACK);
@@ -60,15 +60,15 @@ void handleClient(char *buffer, int sock, int msgSize, struct sockaddr_in addr) 
   } else if (strcmp(action, QUERY) == 0) {
     printf("Got QUERY\n");
     // TODO: Implement logic to find all clients with requested file(s)
-    std::cout << recvPacket->getMessage() << std::endl;
     std::vector<std::string> filesVector = split(recvPacket->getMessage(), '\n');
     std::string packetMessage = "";
     for(auto iter = filesVector.begin(); iter != filesVector.end(); iter++) {
-      std::cout << *iter << std::endl;
-      packetMessage = packetMessage + *iter + "|" + ClientInfo::getClientsByFileName(*iter) + "\n";
+      // Search through every client looking for the file
+      packetMessage = packetMessage + ClientInfo::getClientsByFileName(*iter);
       }
+      std::cout << "Message: " << packetMessage << std::endl;
 
-    Packet *sendPacket = new Packet::Packet(QUERYRESULT, packetMessage.c_str()); // <- Dummy data
+    Packet *sendPacket = new Packet::Packet(QUERYRESULT, packetMessage.c_str());
     if (sendto(sock,
                sendPacket->serialize(),
                strlen(sendPacket->serialize()),
@@ -148,7 +148,6 @@ int main(int argc, char *argv[])
 
         printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
-        std::cout << echoBuffer << std::endl;
         // Create thread to handle client
         std::thread clientThread(handleClient, echoBuffer, sock, recvMsgSize, echoClntAddr);
         // Let the thread run independently
