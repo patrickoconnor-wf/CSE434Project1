@@ -49,7 +49,7 @@ bool ClientInfo::fileFoundInClient(std::string FileBeingSearched){
 }
 
 std::string ClientInfo::getClientsByFileName(std::string fileName){
-  std::string message = "";
+  std::string message = fileName + "|";
 
   for(auto iter = clients.begin(); iter != clients.end(); iter++) {
     // This flag is used to add the ipaddress if the filename being added is the
@@ -57,24 +57,16 @@ std::string ClientInfo::getClientsByFileName(std::string fileName){
     bool firstFileAdded = true;
     bool wasUpdated = false;
       for(auto clientFile = iter->fileNames.begin(); clientFile != iter->fileNames.end(); clientFile++) {
-        std::cout << *clientFile << std::endl;
-        if (fileName == *clientFile) {
-          wasUpdated = true;
-          if (firstFileAdded) {
-            message += iter->getIpAddress();
-            message += "|" + *clientFile;
-            firstFileAdded = false;
-          }
-          else {
-            message += " " + *clientFile;
-          }
-        }
-        if (wasUpdated) {
-          message += "\n"; // Add a newline if the message was updated
-          wasUpdated = false;
+        if (fileName.compare(*clientFile) == 0) {
+          message += iter->getIpAddress();
+          message += " ";
         }
       }
   }
+  if (message.back() == ' ') {
+    message.pop_back();
+  }
+  message += "\n";
   return message;
 }
 bool ClientInfo::removeClient(char* HostName, char *IpAddress)
