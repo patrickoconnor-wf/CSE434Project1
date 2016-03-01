@@ -27,7 +27,7 @@ Requirements
 text.txt|128
 text2.txt|256```
 
- Above we can see the action, hostname, and IP Address delimited by a `|`. On the next line we have the message which in this case is the name of the files that this client is offering as well as their size in bytes.
+ Above we can see the action, hostname, and IP Address delimited by a `|`. On the next line we have the message which in this case is the name of the files that this client is offering as well as their size in bytes. We decided to create a Packet class because it would allow us to very easily parse data from the message that we received. Possibly two of the most important function in this class is the serialize and deserialize functions. The serialize function will take a packet and return a Stringified version of it to be sent over the socket and the deserialize function will take a String and turn it into a new Packet.
 
  What we completed
  =================
