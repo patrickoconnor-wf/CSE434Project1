@@ -1,3 +1,8 @@
+// Authors
+// Patrick O'Connor - paoconno@asu.edu
+// Andrew Moawad - amoawad@asu.edu
+
+
 #include <algorithm>    /* for std::find */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
 #include <iostream>
